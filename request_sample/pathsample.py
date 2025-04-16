@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-#FastAPI 라우터 인스턴스 생성
+#라우터 인스턴스 생성
 router = APIRouter(prefix="/path", tags=["Request Path Exam"])
 
 # Path parameter값과 특정 지정 Path가 충돌되지 않도록 uri 작성 코드 위치에 주의 
@@ -11,12 +11,12 @@ router = APIRouter(prefix="/path", tags=["Request Path Exam"])
 async def all():
     return {"message": "all items"}
 
-@router.get("/test1/{idx}",tags=["/Path Param Sample"], summary="Path Param Ex1", description="Path Param 예제 Type1" )
+@router.get("/test1/{idx}", summary="Path Param Ex1", description="Path Param 예제 Type1" )
 async def path1(idx : int):
     rtn = dict(message="Hello World", params=idx)
     return rtn
 
-@router.get("/test2/{pathStr}",tags=["/Path Param Sample"], summary="Path Param Ex2", description="Path Param 예제 Type2" )
+@router.get("/test2/{pathStr}", summary="Path Param Ex2", description="Path Param 예제 Type2" )
 async def path1(pathStr : str):
     rtn = dict(message="Hello World", params=pathStr)
     return rtn

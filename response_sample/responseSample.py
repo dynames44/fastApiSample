@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Form, status
 from typing import Annotated
-from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
+from fastapi import APIRouter, Form, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 
-#FastAPI 라우터 인스턴스 생성
+#라우터 인스턴스
 router = APIRouter(prefix="/resp", tags=["Response Exam"])
 
 # 요청 데이터용 Pydantic 모델
@@ -44,7 +44,7 @@ async def response_html(item_id: int, item_name: str | None = None):
 async def redirect_only(comment: str | None = None):
 
     #print(f"redirect {comment}")
-    url=f"/resp_json/33?q={comment}"
+    url=f"/resp/resp_json/33?q={comment}"
     return RedirectResponse(url)
 
 # POST 요청 → GET 리다이렉트
@@ -55,7 +55,7 @@ async def create_item(
                       ):
     
     #print(f"item_id: {item_id} item name: {item_name}")
-    url=f"/resp_json/{item_id}?q={item_name}"
+    url=f"/resp/resp_json/{item_id}?q={item_name}"
     return RedirectResponse(url,status_code=status.HTTP_303_SEE_OTHER)
 
 # Pydantic 모델을 사용한 POST 요청 처리 및 응답 모델 지정

@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>Jinja2 If 조건문...</title>
+    </head>
+
+    <body>
+
+        {#     {% if .... %} ..... {% else %} ..... {% endif %}   #} 
+        {#    {% 공백 들어 가면 오류 발생 #} 
+        {#    {% endif %} 필수 #} 
+        {% if gubun == "admin" %}
+        <p>이것은 어드민용 입니다.</p>
+        {% else %}
+        <p> 이것은 일반용 입니다. </p>
+        {% endif %}
+        <h3>{{item}}</h3>
+    </body>
+</html>

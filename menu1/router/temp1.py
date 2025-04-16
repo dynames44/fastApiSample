@@ -11,8 +11,9 @@ class Item(BaseModel):
     name: str
     desc: str
 
+#Jinja2 기본..
 @router.get("/base/{id}", response_class=HTMLResponse)
-async def read_item(request: Request, id: str, q: str | None = None): # template engine을 사용할 경우 반드시 Request 객체가 인자로 입력되어야 함. 
+async def base(request: Request, id: str, q: str | None = None): # template engine을 사용할 경우 반드시 Request 객체가 인자로 입력되어야 함. 
     
     # 내부에서 pydantic 객체 생성. 
     item = Item(name="jinja_base", desc="Jinja2 기본..")
@@ -39,8 +40,9 @@ async def read_item(request: Request, id: str, q: str | None = None): # template
 
     return templates.TemplateResponse("menu1/base.html", viewData)
 
+#Jinja2 If 문.....
 @router.get("/if_sample")
-async def read_item_by_gubun(request: Request, gubun: str):
+async def if_sample(request: Request, gubun: str):
     
     item = Item(name="if_sample", desc="If 조건문...")
 
@@ -54,3 +56,15 @@ async def read_item_by_gubun(request: Request, gubun: str):
     )    
 
     return templates.TemplateResponse("menu2/if_sample.html",viewData)
+
+#Jinja2 반복문..... 
+@router.get("/for_sample", response_class=HTMLResponse)
+async def for_sample(request: Request):
+    
+    item = [Item(name="for_sample_" + str(i), desc="반복문.....") for i in range(5) ]
+    viewData = {
+         "request": request
+        ,"items": item
+    }    
+    
+    return templates.TemplateResponse("menu2/for_sample.html",viewData)

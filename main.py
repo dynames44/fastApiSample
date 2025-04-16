@@ -1,6 +1,13 @@
 from fastapi import FastAPI
-from request_sample import bodyRouter, formRouter, objectRouter, pathRouter, queryRouter
+from fastapi.staticfiles import StaticFiles
+
+#main.py에서 템플릿 직접 지정 할 일이 잇을때 활성화  
+#from core.templates import templates
+
+#router
 from response_sample import resRouter
+from request_sample import bodyRouter, formRouter, objectRouter, pathRouter, queryRouter
+from menu1.router import view1
 
 # FastAPI instance 생성. 
 # uvicorn 실행때 실행 파일:FastAPI 인스턴스 --port=*** --reload
@@ -17,5 +24,11 @@ app.include_router(formRouter)
 app.include_router(objectRouter)
 app.include_router(pathRouter)
 app.include_router(queryRouter)
-
 app.include_router(resRouter)
+
+#Jinja2 샘플 : view router
+app.include_router(view1)
+
+# Static 파일 mount 
+app.mount("/static", StaticFiles(directory="view/static"), name="static")
+

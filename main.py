@@ -30,5 +30,6 @@ app.include_router(resRouter)
 app.include_router(view1)
 
 # Static 파일 mount 
-app.mount("/static", StaticFiles(directory="view/static"), name="static")
+# app.mount("클라이언트가 접근할 URL 경로", StaticFiles("실제 정적파일 경로"), name="템플릿에서 사용할 이름")
+app.mount("/files", StaticFiles(directory="view/static"), name="assets")
 

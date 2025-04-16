@@ -1,12 +1,8 @@
-from pydantic import BaseModel
-from typing import Optional, Annotated
-from fastapi import FastAPI, Form
+from typing import Annotated
+from fastapi import APIRouter, Form
 
-# FastAPI 애플리케이션 인스턴스 생성
-# 실행: uvicorn formSample:app --port=8080  --reload
-app = FastAPI(
-    title="Sample Swagger UI",
-)
+#FastAPI 라우터 인스턴스 생성
+router = APIRouter(prefix="/form", tags=["Request Form Exam"])
 
 # ---------------------------
 # Form 데이터를 받는 기본 예제
@@ -14,7 +10,7 @@ app = FastAPI(
 
 # Form()을 통해 HTML form 필드 데이터를 수신
 # country는 선택적 (None 가능)
-@app.post("/login")
+@router.post("/login")
 async def login(
                 username: str = Form(...),              # Form(...) 필수 필드
                 email: str = Form(None),                # Form(None) 선택 필드
@@ -31,7 +27,7 @@ async def login(
 # ---------------------------
 
 # Form(...)은 필수 입력을 명시적으로 표현
-@app.post("/login_f/")
+@router.post("/login_f/")
 async def login(
                 username: Annotated[str, Form()],              # 필수 필드
                 email: Annotated[str, Form()],                 # 필수 필드
@@ -47,7 +43,7 @@ async def login(
 # Path, Query, Form 파라미터를 함께 사용하는 예제
 # ---------------------------
 
-@app.post("/login_pq/{login_gubun}")
+@router.post("/login_pq/{login_gubun}")
 async def login(
     login_gubun: int,                                   # Path Parameter
     q: str | None = None,                               # Query Parameter

@@ -1,12 +1,8 @@
-from fastapi import FastAPI, Body
+from fastapi import APIRouter, Body
 from pydantic import BaseModel
-from typing import Optional, Annotated
 
-# FastAPI 인스턴스 생성 및 Swagger 문서 제목 지정
-# uvicorn bodySample:app --reload 로 실행 가능
-app = FastAPI(
-    title="Sample Swagger UI",
-)
+#FastAPI 라우터 인스턴스 생성
+router = APIRouter(prefix="/body", tags=["Request Body Exam"])
 
 # ---------------------------
 # Pydantic 모델 정의
@@ -30,7 +26,7 @@ class User(BaseModel):
 # ---------------------------
 
 # 클라이언트가 JSON 형태로 Item 데이터를 보낼 경우 자동으로 바인딩됨
-@app.post("/items")
+@router.post("/items")
 async def create_item(item: Item):
     print("###### item type:", type(item))  # <class 'Item'>
     print("###### item:", item)             # Pydantic 객체 출력
@@ -40,7 +36,7 @@ async def create_item(item: Item):
 # POST: Request Body 활용한 로직 처리
 # ---------------------------
 
-@app.post("/items_tax/")
+@router.post("/items_tax/")
 async def create_item_tax(item: Item):
     # Pydantic 객체를 dict로 변환
     # Pydantic 객체는 변경 불가능 항목 추가 등을 위해 얇은 복사 
@@ -57,7 +53,7 @@ async def create_item_tax(item: Item):
 # ---------------------------
 # PUT: Path + Query + Request Body 함께 사용
 # ---------------------------
-@app.put("/items/{item_id}")
+@router.put("/items/{item_id}")
 async def update_item(item_id: int, item: Item, q: str | None = None):
     
     # item 모델 + 파라미터 item_id = 새로운 딕셔너리 객체 생성 
@@ -75,7 +71,7 @@ async def update_item(item_id: int, item: Item, q: str | None = None):
 # ---------------------------
 # PUT: 여러 개의 Request Body 받기
 # ---------------------------
-@app.put("/items_mt/{item_id}")
+@router.put("/items_mt/{item_id}")
 async def update_item_mt(item_id: int, item: Item, user: User):
     # item, user 둘 다 JSON Body에서 받아야 함
     # 요청 예시 JSON:

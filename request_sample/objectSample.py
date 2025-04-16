@@ -1,16 +1,12 @@
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, Request
 
-# FastAPI 애플리케이션 인스턴스 생성
-# 실행: uvicorn objectSample:app --port=8080 --reload
-app = FastAPI(
-    title="Sample Swagger UI",
-    swagger_ui_parameters={"defaultModelsExpandDepth": -1}  # Swagger에서 모델 숨기기
-)
+#FastAPI 라우터 인스턴스 생성
+router = APIRouter(prefix="/obj", tags=["Request Object Exam"])
 
 # ---------------------------
 # GET 요청: Request 객체 사용 예 (쿼리 파라미터 기반)
 # ---------------------------
-@app.get("/objs")
+@router.get("/objs")
 async def read_item(request: Request):
     client_host = request.client.host                   # 클라이언트 IP 주소
     headers = request.headers                           # 요청 헤더 전체
@@ -45,7 +41,7 @@ async def read_item(request: Request):
 # ---------------------------
 # GET 요청: Path 파라미터 포함
 # ---------------------------
-@app.get("/objs/{item_group}")
+@router.get("/objs/{item_group}")
 async def read_item_p(request: Request, item_group: str):
     client_host = request.client.host
     headers = request.headers
@@ -66,7 +62,7 @@ async def read_item_p(request: Request, item_group: str):
 # ---------------------------
 # POST 요청: JSON Body 처리 - Content-Type: application/json 형태로 넘어온 Body Data를 받아온다.
 # ---------------------------
-@app.post("/objs_json/")
+@router.post("/objs_json/")
 async def create_item_json(request: Request):
     data = await request.json()        # JSON 파싱 (Content-Type: application/json)
     print("received_data:", data)
@@ -75,7 +71,7 @@ async def create_item_json(request: Request):
 # ---------------------------
 # POST 요청: Form Body 처리 
 # ---------------------------
-@app.post("/objs_form/")
+@router.post("/objs_form/")
 async def create_item_form(request: Request):
     data = await request.form()        # Form 파싱 (Content-Type: application/x-www-form-urlencoded or multipart/form-data)
     print("received_data:", data)
@@ -84,7 +80,7 @@ async def create_item_form(request: Request):
 # ---------------------------
 # 추가 예제: 쿠키와 원시 body 데이터 읽기
 # ---------------------------
-@app.post("/objs_misc/")
+@router.post("/objs_misc/")
 async def read_misc_info(request: Request):
     cookies = request.cookies                          # 요청 쿠키들
     raw_body = await request.body()                    # 원시 Body 데이터 (bytes)

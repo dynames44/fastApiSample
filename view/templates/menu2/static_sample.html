@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>JinJa Static</title>
+        <!--# Static mount   접근 url 활용   Static 자원 연결 -->
+        <link rel="stylesheet" href="/files/css/styles.css">
+
+        <!--# Static mount  name값 이용한 url_for(name, 자원경로)  Static 자원 연결 -->
+        <link rel="stylesheet" href="{{ url_for('assets', path='css/styles1.css') }}">
+   
+    </head>
+    <body>
+        <h1>Item id: {{ id }}, query: {{ q_str}} </h1>
+        <h1></h1>
+        <h2>{{item}}</h3>
+        <h3>item_dict:{{item_dict}}</h3>
+        <p>item_dict[name]: {{item_dict['name']}} </p>
+        <br>
+        {# Static mount  name값 이용한 url_for(name, 자원경로)  Static 자원 연결 #} 
+        <p>img type1 </p>
+        <img src="{{ url_for('assets', path='img/logo.png') }}" alt="로고 이미지">
+
+        {# Static mount 접근 url 활용   Static 자원 연결 #} 
+        <p>img type2 </p>
+        <img src="/files/img/logo.png" alt="로고 이미지">
+    </body>
+</html>

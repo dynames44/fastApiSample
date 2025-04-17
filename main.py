@@ -9,6 +9,7 @@ from response_sample import resRouter
 from request_sample import bodyRouter, formRouter, objectRouter, pathRouter, queryRouter
 from menu1.router import view1
 from users.router import userController
+from pydantic_sample import pydantic
 
 
 # FastAPI instance 생성. 
@@ -30,6 +31,7 @@ app.include_router(resRouter)
 
 app.include_router(view1) #Jinja2 샘플
 app.include_router(userController) #사용자 관리 
+app.include_router(pydantic) #사용자 관리 
 
 # Static 파일 mount 
 # app.mount("클라이언트가 접근할 URL 경로", StaticFiles("실제 정적파일 경로"), name="템플릿에서 사용할 이름")

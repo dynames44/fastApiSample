@@ -68,3 +68,22 @@ async def for_sample(request: Request):
     }    
     
     return templates.TemplateResponse("menu2/for_sample.html",viewData)
+
+#Jinja2 Static 자원 활용..... 
+@router.get("/static_sample", response_class=HTMLResponse)
+async def static_sample (request: Request, id: str | None = None, q: str | None = None):
+    
+    item = Item(name="static_sample", desc="Static 자원 활용...")
+
+    item_dict = item.model_dump()
+    item_dict["url"] = "/jinja/static_sample"
+
+    viewData = dict(
+         request = request
+        ,id = id
+        ,q_str = q
+        ,item = item
+        ,item_dict =  item_dict        
+    )
+
+    return templates.TemplateResponse("menu2/static_sample.html",viewData)

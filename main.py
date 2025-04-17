@@ -8,6 +8,8 @@ from fastapi.staticfiles import StaticFiles
 from response_sample import resRouter
 from request_sample import bodyRouter, formRouter, objectRouter, pathRouter, queryRouter
 from menu1.router import view1
+from users.router import userController
+
 
 # FastAPI instance 생성. 
 # uvicorn 실행때 실행 파일:FastAPI 인스턴스 --port=*** --reload
@@ -26,8 +28,8 @@ app.include_router(pathRouter)
 app.include_router(queryRouter)
 app.include_router(resRouter)
 
-#Jinja2 샘플 : view router
-app.include_router(view1)
+app.include_router(view1) #Jinja2 샘플
+app.include_router(userController) #사용자 관리 
 
 # Static 파일 mount 
 # app.mount("클라이언트가 접근할 URL 경로", StaticFiles("실제 정적파일 경로"), name="템플릿에서 사용할 이름")

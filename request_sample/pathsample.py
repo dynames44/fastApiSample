@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 #라우터 인스턴스 생성
-router = APIRouter(prefix="/path", tags=["Request Path Exam"])
+router = APIRouter(prefix="/path", tags=["Request Path Exam"]  ,include_in_schema=False)
 
 # Path parameter값과 특정 지정 Path가 충돌되지 않도록 uri 작성 코드 위치에 주의 
 # python, Fast APi 는 인터프린터 개발 언어로 순차적 실행이 기본..(예외는 있음)

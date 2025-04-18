@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 #FastAPI 라우터 인스턴스 생성
-router = APIRouter(prefix="/query", tags=["Request Get Query Exam"])
+router = APIRouter(prefix="/query", tags=["Request Get Query Exam"]  ,include_in_schema=False)
 
 # 예시용 데이터베이스 역할을 하는 리스트
 fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]

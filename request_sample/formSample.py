@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Form
 
 #FastAPI 라우터 인스턴스 생성
-router = APIRouter(prefix="/form", tags=["Request Form Exam"])
+router = APIRouter(prefix="/form", tags=["Request Form Exam"]  ,include_in_schema=False)
 
 # ---------------------------
 # Form 데이터를 받는 기본 예제

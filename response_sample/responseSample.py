@@ -4,7 +4,7 @@ from fastapi import APIRouter, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 #라우터 인스턴스
-router = APIRouter(prefix="/resp", tags=["Response Exam"])
+router = APIRouter(prefix="/resp", tags=["Response Exam"]  ,include_in_schema=False)
 
 # 요청 데이터용 Pydantic 모델
 class Item(BaseModel):

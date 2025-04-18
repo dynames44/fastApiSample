@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body
 from pydantic import BaseModel
 
 #FastAPI 라우터 인스턴스 생성
-router = APIRouter(prefix="/body", tags=["Request Body Exam"])
+router = APIRouter(prefix="/body", tags=["Request Body Exam"]  ,include_in_schema=False)
 
 # ---------------------------
 # Pydantic 모델 정의

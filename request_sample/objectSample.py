@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 
 #FastAPI 라우터 인스턴스 생성
-router = APIRouter(prefix="/obj", tags=["Request Object Exam"])
+router = APIRouter(prefix="/obj", tags=["Request Object Exam"]  ,include_in_schema=False)
 
 # ---------------------------
 # GET 요청: Request 객체 사용 예 (쿼리 파라미터 기반)

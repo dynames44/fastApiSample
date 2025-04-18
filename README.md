@@ -76,5 +76,5 @@ pip freeze > requirements.txt
 > uvicorn 실행때 실행 파일:FastAPI 인스턴스 --port=*** --reload
 
 ```
-uvicorn main:app --reload
+uvicorn main:app --port=8080 --reload
 ```

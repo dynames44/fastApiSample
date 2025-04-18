@@ -6,6 +6,12 @@ class User(BaseModel):
     password: str
     confirm_password: str
     
+    #Validation Cutom
+    #@field_validator("필드") : 지정된 필드에 검증 처리
+    #@model_validator(처리모드) : 모델 전체 검증 처리  
+     # - mode='before ' , mode='after'
+     #model_validator(mode='before') → field_validator(***) → model_validator(mode='after') 순으로 검증된다.
+    
     @field_validator('username')
     def username_must_not_be_empty(cls, value: str):
         
@@ -20,12 +26,6 @@ class User(BaseModel):
         if len(value) < 8:
             raise ValueError('Password must be at least 8 characters long')
         
-        if not any(char.isdigit() for char in value):
-            raise ValueError('Password must contain at least one digit')
-        
-        if not any(char.isalpha() for char in value):
-            raise ValueError('Password must contain at least one letter')
-        
         return value
     
     @model_validator(mode='after')
@@ -38,11 +38,10 @@ class User(BaseModel):
             raise ValueError("Password do not match")
 
         return values
- 
     
 # 검증 테스트    
 try:
-    user = User(username="john_doe", password="Secret123", confirm_password="Secret123")
+    user = User(username="john_doe", password="Secret123", confirm_password="Secret12")
     print(user)
 except ValidationError as e:
     print(e)

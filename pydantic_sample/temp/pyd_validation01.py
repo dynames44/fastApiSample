@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ValidationError, ConfigDict, Field, Strict
+from pydantic import BaseModel, ValidationError, Field, Strict
 from typing import List, Annotated
 
 class Address(BaseModel):
@@ -7,10 +7,15 @@ class Address(BaseModel):
     country: str
 
 class User(BaseModel):
-    #Strict 입력값의 자료형 자동 변환을 허용할지 여부를 설정하는 옵션입니다.
-    #strict=True → 자동 형변환 허용 안 함, 타입이 정확히 일치해야 함
-    #strict=False → 자동 형변환 허용, 예: "123"(문자열)도 int로 받아들임    
-    # model_config = ConfigDict(strict=True) #모델 전체에 Strict 적용 
+    
+    # model_config : class Model 전체에 적용될 옵션 지정 
+    model_config = {
+        "title": "회원정보 모델",                  # 모델 제목  (문서화용)
+        "description": "회원정보 구조",         # 모델 대한 설명 (문서화용)
+        "populate_by_name": True,              # 필드명, 필드 Alias 병행 사용여부 - True : 병행 가능, False: 필드 Alias만 인정 
+        "strict": True,                        # 타입 자동 변환 비허용 (정확한 타입만 허용)
+        "extra": "ignore"                      # 선언되지 않은 필드가 들어오면.....forbid-에러발생, ignore - 필드 무시 (모델 저장되지 않음), allow - 필드 모델 포함 (dict로 저장됨)
+    }    
 
     userIdx: int                
     userNm: str                 

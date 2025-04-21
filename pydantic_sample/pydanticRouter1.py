@@ -7,55 +7,54 @@ from fastapi import APIRouter, Path, Query, Form, Depends
 router = APIRouter(prefix="/pydantic1" ,tags=["Pydantic Validator Exam"])
 #router = APIRouter(prefix="/pydantic1"  ,include_in_schema=False)
 
-# JSON Body로 Item을 받아서 처리
+# Path, Query, Request Body(json)
 @router.put("/items/{item_id}")
 async def update_item(
-         item_id: int
-        ,q: str
-        ,item: Item = None # 필수아님 
+          item_id: int # path param
+         ,test : str   # query param : Model 에 포함된 값이 아니니.... 
+         ,item: Item = None #Model Request Body로 받는다.
     ):
     rtnData = {
-         "item_id": item_id,
-         "q": q,
-         "item": item
+         "item_id": item_id
+         ,"test" : test
+         ,"item" : item
     }
     return rtnData
 
 # Path, Query, Request Body(json)
-# item_id는 경로에서, q1/q2는 쿼리에서, item은 JSON으로 받음
+# query param을 명시적으로 변경 
 @router.put("/items_json/{item_id}")
 async def update_item_json(
         item_id: int = Path(..., gt=0), #Path Param으로 받음.. Path(..제약조건 기술)
-        q1: Annotated[str, Query(max_length=50)] = None, 
-        q2: Annotated[str, Query(min_length=50)] = None,
+        test1: Annotated[str, Query(max_length=50)] = None, 
+        test2: Annotated[str, Query(min_length=2)] = None,
         item: Item = None #Request Body로 Pydantic 모델 형태로 받는다......
     ):
     
     rtnData = {
         "item_id": item_id,
-        "q1": q1,
-        "q2": q2,
+        "test1": test1,
+        "test2": test2,
         "item": item
     }
     
     return rtnData
 
-# Path, Query, Form
-# HTML 폼에서 값 받기 (Form 방식), JSON 아님
+# Path, Form
 @router.post("/items_form/{item_id}")
 async def update_item_form(
         
         item_id: Annotated[int, Path(..., gt=0)],
         name: Annotated[str, Form(..., min_length=2, max_length=50)],
-        price: Annotated[str, Form(..., ge=0)],
-        q: Annotated[Optional[str], Form(max_length=50)]=None,
+        price: Annotated[int, Form(..., ge=0)],
+        test: Annotated[Optional[str], Form(max_length=50)]=None,
         description: Annotated[Optional[str], Form(max_length=500)]=None,
         tax: Annotated[float, Form()] =None # 뒤에 = None 설정되지 않아 필수 값이 된다.
     ):
     
     rtnData = {
         "item_id": item_id,
-        "q": q,
+        "test": test,
         "name": name,
         "description": description,
         "price": price,

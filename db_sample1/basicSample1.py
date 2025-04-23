@@ -1,18 +1,13 @@
 from fastapi import APIRouter, Query
 from typing import Annotated, Optional
+from .sample_usecase import usecase
 from core.dbUtil import get_db_conn, execute_query_wo_conn, execute_query_wt_conn, execute_transaction, set_exec_result
 router = APIRouter(prefix="/dbSample1"  ,include_in_schema=False ,tags=["DB Exam"])
 
 @router.get("/singleQuery")
 async def single_query():
 
-    query : str = """
-            SELECT 
-                     id
-                    ,title 
-            FROM blog
-            """
-    rtnData = execute_query_wt_conn(query)
+    rtnData = await usecase.single_query()
     return rtnData
 
 @router.get("/conditionQuery")

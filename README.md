@@ -77,4 +77,5 @@ pip freeze > requirements.txt
 
 ```
 uvicorn main:app --port=8080 --reload
+uvicorn main:app --port=8080 --workers=4 ( --workers=$(nproc) 또는 Gunicorn )
 ```

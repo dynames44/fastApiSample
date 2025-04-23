@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Query
 from typing import Annotated, Optional
 from core.dbUtil import get_db_conn, execute_query_wo_conn, execute_query_wt_conn, execute_transaction, set_exec_result
-
 router = APIRouter(prefix="/dbSample1"  ,include_in_schema=False ,tags=["DB Exam"])
 
-#http://127.0.0.1:8080/dbSample1/singleQuery    
 @router.get("/singleQuery")
 async def single_query():
 
@@ -17,7 +15,6 @@ async def single_query():
     rtnData = execute_query_wt_conn(query)
     return rtnData
 
-#http://127.0.0.1:8080/dbSample1/conditionQuery?blog_id=2
 @router.get("/conditionQuery")
 async def condition_query(blog_id: Annotated[int, Query(...)]):
 
@@ -36,7 +33,6 @@ async def condition_query(blog_id: Annotated[int, Query(...)]):
     rtnData = execute_query_wt_conn(query,params)
     return rtnData
 
-#http://127.0.0.1:8080/dbSample1/fineOne?blog_id=2
 @router.get("/fineOne")
 async def fineOne(blog_id: Annotated[int, Query(...)]):
 
@@ -55,7 +51,6 @@ async def fineOne(blog_id: Annotated[int, Query(...)]):
     rtnData = execute_query_wt_conn(query,params,True)
     return rtnData
 
-#http://127.0.0.1:8080/dbSample1/dualQuery
 @router.get("/dualQuery")
 async def dual_query():
     

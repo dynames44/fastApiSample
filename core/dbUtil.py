@@ -13,7 +13,8 @@ def load_conn_env():
         "port": decryt(os.getenv("DB_PORT")),
         "user": decryt(os.getenv("DB_USER")),
         "passwd": decryt(os.getenv("DB_PASSWD")),
-        "dbms": decryt(os.getenv("DB_DBMS")),
+        #"dbms": decryt(os.getenv("DB_DBMS")),
+        "dbms": "py_db",        
     }
 
 def get_connection_url(envs):
@@ -56,39 +57,41 @@ def execute_query_wt_conn(sql: str, params: dict = None, find_one: bool = False)
     engine = get_db_conn()
     
     if not engine:
-        rtnResult = set_exec_result("Error" ,"DB Conn 생성 실패" ,0)
-        return rtnResult
-    
+        return set_exec_result("Error", "DB Conn 생성 실패", 0)
+
     try:
         with engine.connect() as conn:
             stmt = text(sql)
-            result = conn.execute(stmt, params or {})
-            
-            if result.returns_rows:  # SELECT 쿼리
-                if find_one:  # 단건 조회
-                    data = result.fetchone()
-                    
-                    if data is None:
-                       rtnResult = set_exec_result("Error" ,"조회된 건이 없습니다." ,0 ,"")     
-                    else:
-                       rtnResult = set_exec_result("Success" ,"" ,0 ,dict(data._mapping))
-                        
-                else:  # 다건 조회
-                    dataList = result.fetchall()
-                    
-                    if not dataList:
-                       rtnResult = set_exec_result("Error" ,"조회된 건이 없습니다." ,0 ,"")
-                    else:
-                        rtnResult = set_exec_result("Success" ,"" ,len(dataList) ,[dict(data._mapping) for data in dataList])
-                        
-            else:  # DML 쿼리 (INSERT, UPDATE, DELETE)
-                rtnResult = set_exec_result("Success" ,"" ,result.rowcount)
-            
-    except SQLAlchemyError as e:
-        rtnResult = set_exec_result("Error" ,f"쿼리 실행 오류: {e}" ,0)
-    
-    return rtnResult
 
+            if stmt.supports_execution:  # 트랜잭션 처리 필요 시
+                with conn.begin():
+                    result = conn.execute(stmt, params or {})
+            else:
+                result = conn.execute(stmt, params or {})
+
+            if result.returns_rows:  # SELECT 쿼리
+                if find_one:
+                    data = result.fetchone()
+                    if data is None:
+                        rtnResult = set_exec_result("Error", "조회된 건이 없습니다.", 0, "")
+                    else:
+                        rtnResult = set_exec_result("Success", "", 0, {k.lower(): v for k, v in data._mapping.items()})
+                else:
+                    dataList = result.fetchall()
+                    if not dataList:
+                        rtnResult = set_exec_result("Error", "조회된 건이 없습니다.", 0, "")
+                    else:
+                        rtnResult = set_exec_result(
+                            "Success", "", len(dataList),
+                            [{k.lower(): v for k, v in row._mapping.items()} for row in dataList]
+                        )
+            else:  # DML
+                rtnResult = set_exec_result("Success", "", result.rowcount)
+
+    except SQLAlchemyError as e:
+        rtnResult = set_exec_result("Error", f"쿼리 실행 오류: {e}", 0)
+
+    return rtnResult
 
 def execute_query_wo_conn(engine, sql: str, params: dict = None, find_one: bool = False):
     rtnResult: dict = {}
@@ -96,8 +99,13 @@ def execute_query_wo_conn(engine, sql: str, params: dict = None, find_one: bool 
     try:
         with engine.connect() as conn:
             stmt = text(sql)
-            result = conn.execute(stmt, params or {})
-            
+
+            if stmt.supports_execution:  # 트랜잭션 처리 필요 시
+                with conn.begin():
+                    result = conn.execute(stmt, params or {})
+            else:
+                result = conn.execute(stmt, params or {})
+
             if result.returns_rows:  # SELECT 쿼리
                 if find_one:  # 단건 조회
                     data = result.fetchone()
@@ -106,7 +114,7 @@ def execute_query_wo_conn(engine, sql: str, params: dict = None, find_one: bool 
                         rtnResult = set_exec_result("Error" ,"조회된 건이 없습니다." ,0 ,"")
                         
                     else:
-                        rtnResult = set_exec_result("Success" ,"" ,0 ,dict(data._mapping))
+                        rtnResult = set_exec_result("Success" ,"" ,0 ,dict((k.lower(), v) for k, v in data._mapping.items()))
                         
                         
                 else:  # 다건 조회
@@ -115,7 +123,7 @@ def execute_query_wo_conn(engine, sql: str, params: dict = None, find_one: bool 
                     if not dataList:
                         rtnResult = set_exec_result("Error" ,"조회된 건이 없습니다." ,0 ,"")
                     else:
-                        rtnResult = set_exec_result("Success" ,"" ,len(dataList) ,[dict(data._mapping) for data in dataList])
+                        rtnResult = set_exec_result("Success" ,"" ,len(dataList) ,[dict((k.lower(), v) for k, v in row._mapping.items()) for row in dataList])
                         
             else:  # DML 쿼리 (INSERT, UPDATE, DELETE)
                 rtnResult = set_exec_result("Success" ,"" ,result.rowcount)
@@ -196,64 +204,3 @@ def execute_transaction(queries: list[str]):
         rtnResult = set_exec_result("Error" ,f"트랜잭션 오류: {e}" ,0)
     
     return rtnResult
-
-# def execute_transaction_dict(queries: list[tuple[str, dict]]):
-    
-#     engine = get_db_conn()
-#     if not engine:
-#         return {"status": "DB Conn 생성 실패"}
-
-#     try:
-#         with engine.connect() as conn:
-#             trans = conn.begin()
-            
-#             try:
-#                 for sql, params in queries:
-#                     conn.execute(text(sql), params)
-#                 trans.commit()
-#                 return {"status": "commit 완료"}
-            
-#             except:
-#                 trans.rollback()
-#                 raise
-            
-#     except SQLAlchemyError as e:
-#         print("트랜잭션 오류:", e)
-#         return {"status": "rollback됨"}
-
-
-# def execute_query(engine, sql: str, find_one: bool = False):
-    
-#     rtnResult: dict = {}
-    
-#     try:
-#         with engine.connect() as conn:
-#             stmt = text(sql)
-#             result = conn.execute(stmt)
-            
-#             if result.returns_rows:  # SELECT 쿼리
-#                 if find_one:  # 단건 조회
-#                     data = result.fetchone()
-                    
-#                     if data is None:
-#                         rtnResult = set_exec_result("Error" ,"조회된 건이 없습니다." ,0 ,"")
-                        
-#                     else:
-#                         rtnResult = set_exec_result("Success" ,"" ,0 ,dict(data._mapping))
-                        
-                        
-#                 else:  # 다건 조회
-#                     dataList = result.fetchall()
-                    
-#                     if not dataList:
-#                         rtnResult = set_exec_result("Error" ,"조회된 건이 없습니다." ,0 ,"")
-#                     else:
-#                         rtnResult = set_exec_result("Success" ,"" ,len(dataList) ,[dict(data._mapping) for data in dataList])
-                        
-#             else:  # DML 쿼리 (INSERT, UPDATE, DELETE)
-#                 rtnResult = set_exec_result("Success" ,"" ,result.rowcount)
-            
-#     except SQLAlchemyError as e:
-#         rtnResult = set_exec_result("Error" ,f"쿼리 실행 오류: {e}" ,0)
-    
-#     return rtnResult

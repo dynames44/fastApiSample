@@ -1,81 +1,105 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query,Depends
 from typing import Annotated, Optional
 from .sample_usecase import usecase
-from core.dbUtil import get_db_conn, execute_query_wo_conn, execute_query_wt_conn, execute_transaction, set_exec_result
-router = APIRouter(prefix="/dbSample1"  ,include_in_schema=False ,tags=["DB Exam"])
+from .sample_model import serch_model, find_user, sys_user, user_etc
 
-@router.get("/singleQuery")
-async def single_query():
+router = APIRouter(prefix="/dbSample1"  ,tags=["DB Exam"])
 
-    rtnData = await usecase.single_query()
+# #사용자 정보 조회  
+@router.get("/get_user_list")
+async def get_user_list(
+    use_yn: Annotated[Optional[str], Query()] = None,
+    email: Annotated[Optional[str], Query()] = None,
+):
+    params = dict(
+         use_yn = use_yn
+        ,email = email
+    )
+
+    rtnData = await usecase.get_user_list(params)
     return rtnData
 
-@router.get("/conditionQuery")
-async def condition_query(blog_id: Annotated[int, Query(...)]):
+#사용자 정보 조회 :  파라미터를 데이터 모델로 받는다.
+@router.get("/get_user_list_extd")
+async def get_user_list_extd(params: serch_model = Depends()):
 
-    query : str = """
-            SELECT 
-                     id
-                    ,title 
-            FROM blog
-            WHERE id >= :blog_id
-            """
-            
-    params = {
-        "blog_id": blog_id
-    }            
-            
-    rtnData = execute_query_wt_conn(query,params)
+    params_dict : dict = params.model_dump() #모델로 받은것을 딕셔너리로 변환 : 뒤에 처리 레벨의 일관성 유지 
+    rtnData = await usecase.get_user_list(params_dict)
     return rtnData
 
-@router.get("/fineOne")
-async def fineOne(blog_id: Annotated[int, Query(...)]):
+#사용자 상세 조회  
+@router.get("/get_user_info")
+async def get_user_info(params: find_user = Depends()):
 
-    query : str = """
-            SELECT 
-                     id
-                    ,title 
-            FROM blog
-            WHERE id = :blog_id
-            """
-            
-    params = {
-        "blog_id": blog_id
-    }            
-            
-    rtnData = execute_query_wt_conn(query,params,True)
+    params_dict : dict = params.model_dump()
+    rtnData = await usecase.get_user_info(params_dict)
     return rtnData
 
-@router.get("/dualQuery")
-async def dual_query():
+#사용자정보 + 기타 정보 : 별도 쿼리 실행 
+@router.get("/get_user_all")
+async def get_user_all(
+    user_id: Annotated[Optional[str], Query()] = None,
+    userParam: serch_model = Depends()):
     
-    rtnResult: dict = {}
-    conn = get_db_conn()
+    etcParam = dict(
+         user_id = user_id
+    )    
     
-    if conn:
-
-        query = "SELECT id, title FROM blog"
-        row = execute_query_wo_conn(conn, query)
-        row1 = execute_query_wo_conn(conn, query)
-        
-        if row.get("result_code") == "Success" and  row1.get("result_code") == "Success" :
-            rtnResult = set_exec_result("Success", "",0)
-            subData = {'row': row.get("result_data"), 'row1': row1.get("result_data")}
-            rtnResult["result_data"] = subData
-            
-        else:    
-            rtnResult = ("Error" ,"조회된 건이 없습니다." ,0 ,"")
-            
-        return rtnResult
-    
-@router.get("/tranQuery")
-async def transaction_query():
-
-    query = "INSERT INTO blog (title) VALUES ('제목12')"
-    query2 = "INSERT INTO system (name) VALUES ('시스템1')"
-    query3 = "SELECT id, title FROM blog"
-
-    queries = [query, query2, query3]
-    #queries = [query, query3]
-    rtnData = execute_transaction(queries)
+    params_dict = userParam.model_dump()
+    rtnData = await usecase.get_user_all(params_dict,etcParam)
     return rtnData
+
+#사용자 정보 + 기타 정보 : Join  
+@router.get("/get_user_join")
+async def get_user_join(
+    user_id: Annotated[Optional[str], Query()] = None,
+    userParam: serch_model = Depends()):
+    
+    params_dict = userParam.model_dump()
+    params_dict["user_id"] = user_id
+    rtnData = await usecase.get_user_join(params_dict)
+    return rtnData
+
+#사용자 정보 INSERT
+@router.post("/insert_sys_user")
+async def insert_sys_user( param: sys_user):
+    
+    params_dict = param.model_dump()
+    rtnData = await usecase.insert_sys_user(params_dict)
+    return rtnData
+
+#사용자 정보 UPDATE
+@router.post("/update_sys_user")
+async def update_sys_user( param: sys_user):
+    
+    params_dict = param.model_dump()
+    rtnData = await usecase.update_sys_user(params_dict)
+    return rtnData
+
+#사용자 기타정보 INSERT
+@router.post("/insert_user_etc")
+async def insert_user_etc( param: user_etc):
+    
+    params_dict = param.model_dump()
+    rtnData = await usecase.insert_user_etc(params_dict)
+    return rtnData
+
+#사용자 기타정보 UPDATE
+@router.post("/update_user_etc")
+async def update_user_etc( param: user_etc):
+    
+    params_dict = param.model_dump()
+    rtnData = await usecase.update_user_etc(params_dict)
+    return rtnData
+
+# @router.get("/tranQuery")
+# async def transaction_query():
+
+#     query = "INSERT INTO blog (title) VALUES ('제목12')"
+#     query2 = "INSERT INTO system (name) VALUES ('시스템1')"
+#     query3 = "SELECT id, title FROM blog"
+
+#     queries = [query, query2, query3]
+#     #queries = [query, query3]
+#     rtnData = execute_transaction(queries)
+#     return rtnData

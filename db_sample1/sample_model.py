@@ -6,7 +6,7 @@ class BaseUserId(BaseModel):
     user_id: Annotated[str, Field(...)]
 
 class sys_user(BaseUserId): # 공통모델 상속받고 추가 항목만....
-    user_nm: Annotated[str, Field(..., max_length=50)]
+    user_nm: Annotated[str, Field(None, max_length=50)]
     user_pw: Annotated[Optional[str], Field(None, min_length=2, max_length=20)]
     use_yn: Annotated[Optional[str], Field(None, max_length=1)]
     email: Annotated[Optional[str], Field(None, max_length=100)]

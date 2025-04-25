@@ -1,7 +1,7 @@
-from core.dbUtil import get_db_conn, execute_query_wo_conn, execute_query_wt_conn, execute_transaction, set_exec_result
+from core.dbUtil import execute_query
 
 #사용자 목록 조회 
-async def get_user_list(params : dict = None, conn = None):
+async def get_user_list(params : dict ,transact: bool = False ,conn = None):
 
     rtnData = {}
     conditions = []     
@@ -25,16 +25,11 @@ async def get_user_list(params : dict = None, conn = None):
     if conditions:
         query_base += " WHERE " + " AND ".join(conditions)    
 
-    #외부에서 DB연결을 했으면 해당 커넥션을 사용 
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,params)
-    else:
-        rtnData = execute_query_wt_conn(query_base,params)
-    
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)    
     return rtnData
 
 #사용자 상세정보 
-async def get_user_info(params : dict ,conn = None):
+async def get_user_info(params : dict ,transact: bool = False ,conn = None):
     
     rtnData = {}
     query_base : str = """
@@ -49,15 +44,11 @@ async def get_user_info(params : dict ,conn = None):
             WHERE   A.USER_ID = :user_id
             """
     
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,params,True)
-    else:
-        rtnData = execute_query_wt_conn(query_base,params,True)    
-    
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)    
     return rtnData
 
 #사용자 기타정보보 조회 
-async def get_etcinfo_list(params : dict = None ,conn = None):
+async def get_etcinfo_list(params : dict ,transact: bool = False ,conn = None):
 
     rtnData = {}
     conditions = []     
@@ -79,15 +70,11 @@ async def get_etcinfo_list(params : dict = None ,conn = None):
     if conditions:
         query_base += " WHERE " + " AND ".join(conditions)    
         
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,params)
-    else:
-        rtnData = execute_query_wt_conn(query_base,params)
-    
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)    
     return rtnData
 
 #사용자 정보 + 기타 정보 : Join  
-async def get_user_join(params : dict = None ,conn = None):
+async def get_user_join(params : dict ,transact: bool = False ,conn = None):
 
     rtnData = {}
     conditions = []     
@@ -123,15 +110,11 @@ async def get_user_join(params : dict = None ,conn = None):
     #print("query_base::::",query_base)   
     #query_base += " ORDER BY A.USER_ID ASC "       
         
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,params)
-    else:
-        rtnData = execute_query_wt_conn(query_base,params)
-        
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)    
     return rtnData
 
 #사용자 정보 insert
-async def insert_sys_user(params : dict ,conn = None):
+async def insert_sys_user(params : dict ,transact: bool = False ,conn = None):
     
     values = []
     columns = []
@@ -153,15 +136,11 @@ async def insert_sys_user(params : dict ,conn = None):
         f"VALUES ({', '.join(values)})"
     )
         
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,data_params)
-    else:
-        rtnData = execute_query_wt_conn(query_base,data_params)
-        
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)    
     return rtnData
 
 #사용자 정보 update
-async def update_sys_user(params : dict ,conn = None):
+async def update_sys_user(params : dict ,transact: bool = False ,conn = None):
     
     rtnData = {}
     set_columns = []
@@ -182,15 +161,15 @@ async def update_sys_user(params : dict ,conn = None):
         "WHERE USER_ID = :user_id"
     )
         
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,data_params)
-    else:
-        rtnData = execute_query_wt_conn(query_base,data_params)
-        
+    # if conn is not None:    
+    #     rtnData = execute_query_wo_conn(conn,query_base,data_params)
+    # else:
+    #     rtnData = execute_query_wt_conn(query_base,data_params)
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)            
     return rtnData
 
 #사용자 기타정보 insert
-async def insert_user_etc(params : dict ,conn = None):
+async def insert_user_etc(params : dict ,transact: bool = False ,conn = None):
     
     values = []
     columns = []
@@ -212,15 +191,11 @@ async def insert_user_etc(params : dict ,conn = None):
         f"VALUES ({', '.join(values)})"
     )
         
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,data_params)
-    else:
-        rtnData = execute_query_wt_conn(query_base,data_params)
-        
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)                    
     return rtnData
 
 #사용자 기타정보 update
-async def update_user_etc(params : dict ,conn = None):
+async def update_user_etc(params : dict ,transact: bool = False ,conn = None):
     
     rtnData = {}
     set_columns = []
@@ -241,11 +216,7 @@ async def update_user_etc(params : dict ,conn = None):
         "WHERE USER_ID = :user_id"
     )
         
-    if conn is not None:    
-        rtnData = execute_query_wo_conn(conn,query_base,data_params)
-    else:
-        rtnData = execute_query_wt_conn(query_base,data_params)
-        
+    rtnData = execute_query(query_base, params, find_one = False, db_transact = transact, db_conn= conn)    
     return rtnData
 
 class sample_repository:

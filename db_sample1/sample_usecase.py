@@ -21,8 +21,8 @@ async def get_user_all(
         conn = get_db_conn()
         
         if conn:
-            user_list =  await repository.get_user_list(userParam,conn) 
-            etcinfo_list = await repository.get_etcinfo_list(etcParam,conn)
+            user_list =  await repository.get_user_list(userParam ,conn=conn) 
+            etcinfo_list = await repository.get_etcinfo_list(etcParam ,conn=conn)
             
             if user_list.get("result_code") == "Success" and  etcinfo_list.get("result_code") == "Success" :
                 rtnResult = set_exec_result("Success", "",0)
@@ -60,6 +60,40 @@ async def insert_user_etc(param):
 async def update_user_etc(param):
     return await repository.update_user_etc(param)
 
+#사용자정보 +  기타정보 INSERT 트랜젝션 적용 
+async def insert_user_dual (userParam: dict, etcParam: dict):
+    
+    rtnResult = {}
+    engine = get_db_conn()
+    
+    if not engine:
+        return set_exec_result("Error", "DB Conn 생성 실패", 0)
+
+    try:
+        with engine.connect() as conn:
+            trans = conn.begin()
+            
+            try:
+                result1 = await repository.insert_sys_user(userParam ,True ,conn=conn)
+                result2 = await repository.insert_user_etc(etcParam ,True ,conn=conn)
+
+                #두 쿼리 모두 성공해야 커밋
+                if result1["result_code"] == "Success" and result2["result_code"] == "Success":
+                    trans.commit()
+                    rtnResult = set_exec_result("Success", "", 2)
+                else:
+                    trans.rollback()
+                    rtnResult = set_exec_result("Error", "트랜잭션 중 일부 실패", 0)
+
+            except Exception as e:
+                trans.rollback()
+                rtnResult = set_exec_result("Error", f"트랜잭션 처리 중 오류: {e}", 0)
+
+    except SQLAlchemyError as e:
+        rtnResult = set_exec_result("Error", f"DB 오류: {e}", 0)
+
+    return rtnResult
+
 class usecase:
     get_user_list = staticmethod(get_user_list)
     get_user_info = staticmethod(get_user_info)
@@ -69,3 +103,4 @@ class usecase:
     update_sys_user = staticmethod(update_sys_user)
     insert_user_etc = staticmethod(insert_user_etc)
     update_user_etc = staticmethod(update_user_etc)
+    insert_user_dual = staticmethod(insert_user_dual)

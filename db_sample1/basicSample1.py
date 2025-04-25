@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query,Depends
+from fastapi import APIRouter, Query,Depends, Body
 from typing import Annotated, Optional
 from .sample_usecase import usecase
 from .sample_model import serch_model, find_user, sys_user, user_etc
@@ -90,6 +90,19 @@ async def update_user_etc( param: user_etc):
     
     params_dict = param.model_dump()
     rtnData = await usecase.update_user_etc(params_dict)
+    return rtnData
+
+#사용자정보 +  기타정보 INSERT 트랜젝션 적용 
+@router.post("/insert_user_dual")
+async def insert_user_dual( 
+                 sys_user_param: sys_user = Body(...)
+                ,user_etc_param: user_etc = Body(...)
+          ):
+    
+    sys_user_dict = sys_user_param.model_dump()
+    user_etc_dict = user_etc_param.model_dump()
+    
+    rtnData = await usecase.insert_user_dual(sys_user_dict, user_etc_dict)
     return rtnData
 
 # @router.get("/tranQuery")

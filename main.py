@@ -11,7 +11,8 @@ from menu1.router import view1
 from users.router import userController
 from pydantic_sample import pydantic1, pydantic2
 from async_sample import async1
-from  db_sample1 import dbSample1
+from db_sample1 import dbSample1
+from orm_sample import orm_router
 
 
 # FastAPI instance 생성. 
@@ -38,6 +39,9 @@ app.include_router(pydantic2) #Pydantic Model Validation 예제
 
 app.include_router(async1) #
 app.include_router(dbSample1) #
+app.include_router(orm_router) #
+
+
 
 # Static 파일 mount 
 # app.mount("클라이언트가 접근할 URL 경로", StaticFiles("실제 정적파일 경로"), name="템플릿에서 사용할 이름")

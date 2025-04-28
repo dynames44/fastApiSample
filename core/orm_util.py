@@ -25,9 +25,7 @@ def get_db_session ():
     # 엔진 및 세션 팩토리 생성
     engine = create_engine(conn_str, echo=True, future=True)
     session_factory = sessionmaker(bind=engine, autocommit=False, autoflush=False)
-    
     return session_factory
-    
     
 def get_db_commit_session ():
     
@@ -37,9 +35,7 @@ def get_db_commit_session ():
     # 엔진 및 세션 팩토리 생성
     engine = create_engine(conn_str, echo=True, future=True)
     session_factory = sessionmaker(bind=engine, autocommit=True, autoflush=True)
-    
     return session_factory
-    
     
 def set_exec_result(result_code : str, result_msg : str , result_count : int,  result_data = None):
     

@@ -1,17 +1,32 @@
-from sqlalchemy import Column, String, DateTime, func
+from sqlalchemy import Column, String, DateTime, func, Integer, Float, Boolean
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
 class BaseModel(Base):
-    __abstract__ = True  # 테이블 생성 방지
+    __abstract__ = True
 
     def to_dict(self):
-        return {
-            column.name: getattr(self, column.name)
-            for column in self.__table__.columns
-        }
+        
+        result = {}
+        
+        for column in self.__table__.columns:
+            value = getattr(self, column.name, None)
+            
+            # null 일때 기본값 
+            if value is None: 
+                if isinstance(column.type, String):
+                    result[column.name] = ""
+                    
+                elif isinstance(column.type, (Integer, Float)):
+                    result[column.name] = 0
+                    
+                else:
+                    result[column.name] = None  # 나머지는 그냥 None
+            else:
+                result[column.name] = value
 
+        return result
 
 class SysUser(BaseModel):
     __tablename__ = "tb_sys_user"
